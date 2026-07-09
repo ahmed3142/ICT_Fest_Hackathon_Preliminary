@@ -46,10 +46,9 @@ def generate_export(
     include_all: bool,
 ) -> str:
     if include_all:
-        if room_id is not None:
-            rows = fetch_bookings_raw(db, room_id)
-        else:
-            rows = _fetch_scoped(db, org_id, None, None)
+        # Every path must stay scoped to the caller's org; fetch_bookings_raw
+        # ignores org_id and would leak other tenants' bookings.
+        rows = _fetch_scoped(db, org_id, None, room_id)
     else:
         rows = _fetch_scoped(db, org_id, user_id, room_id)
 
